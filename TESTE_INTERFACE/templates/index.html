@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Supervisionado do Aquário</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.8em;
+            margin: 10px 0 20px 0; /* Reduz a margem superior */
+        }
+        .data-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .data-table {
+            font-size: 1.5em;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        .data-table td {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .data-table td:first-child,
+        .data-table td:nth-child(3) {
+            font-weight: bold;
+            text-align: right;
+        }
+        #alerts {
+            color: white;
+            background-color: red;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 1.2em;
+            display: none;
+            text-align: center;
+        }
+        .image-container {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-left: 2rem;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script>
+        async function fetchData() {
+            const response = await fetch('/data');
+            const data = await response.json();
+            document.getElementById('ldr').innerText = `${data.ldr} lux`;
+            document.getElementById('led').innerText = data.led;
+            document.getElementById('temperature').innerText = `${data.temperature} °C`;
+            document.getElementById('buzzer').innerText = data.buzzer;
+            document.getElementById('water_level').innerText = data.water_level;
+            document.getElementById('pump').innerText = data.pump;
+            document.getElementById('situation').src = `/static/Situacao/Situacao_${data.situation}.png`;
+
+            // Exibir alertas na tela
+            const alerts = [];
+            if (data.led === "Ligado" && data.ldr < 600) {
+                alerts.push("Alerta: Luminosidade baixa e LED aceso");
+            }
+            if (data.buzzer === "Ligado" && data.temperature > 30) {
+                alerts.push("Alerta: Temperatura alta e Buzzer acionado");
+            }
+            if (data.pump === "Ligado" && data.water_level === 0) {
+                alerts.push("Alerta: Nível de água baixo e Bomba acionada");
+            }
+            const alertsDiv = document.getElementById('alerts');
+            if (alerts.length > 0) {
+                alertsDiv.innerHTML = alerts.join('<br>');
+                alertsDiv.style.display = 'block';
+            } else {
+                alertsDiv.style.display = 'none';
+            }
+        }
+
+        setInterval(fetchData, 1000);
+    </script>
+</head>
+<body>
+    <h1>Sistema Supervisionado do Aquário</h1>
+    <div class="image-container">
+        <img id="situation" src="/static/Situacao/Situacao_0.png" alt="Situação Atual" width="600">
+    </div>
+    <div id="alerts"></div>
+    <div class="data-container">
+        <table class="data-table">
+            <tr>
+                <td>LDR:</td>
+                <td id="ldr">0 lux</td>
+                <td>LED:</td>
+                <td id="led">Desligado</td>
+            </tr>
+            <tr>
+                <td>Temperature:</td>
+                <td id="temperature">0 °C</td>
+                <td>Buzzer:</td>
+                <td id="buzzer">Desligado</td>
+            </tr>
+            <tr>
+                <td>Water Level:</td>
+                <td id="water_level">0</td>
+                <td>Bomba:</td>
+                <td id="pump">Desligado</td>
+            </tr>
+        </table>
+    </div>
+    <div class="button-container">
+        <button onclick="window.open('/report', '_blank')">Gerar Relatório</button>
+        <button onclick="window.open('/graph_report', '_blank')">Gerar Relatório com Gráficos</button>
+        <button onclick="window.open('/alarm_report', '_blank')">Gerar Relatório de Alarmes</button>
+    </div>
+</body>
+</html>
