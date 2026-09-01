@@ -6,7 +6,7 @@ O projeto utiliza sensores para monitorar luminosidade, temperatura e nível da 
 
 Além da automação física, foi desenvolvido um sistema supervisório responsável por receber os dados do Arduino, armazenar os registros, apresentar o estado do aquário em tempo real e gerar relatórios.
 
-Todo funcionamento pode ser visto nesse [Documento] e neste [Video] 
+Todo funcionamento e imagens pode ser visto nesse [Documento](Slide-Automatização_de_aquários.pdf) e neste [Video](Video_Pratica2.MP4) 
 
 ---
 
